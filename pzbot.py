@@ -144,6 +144,26 @@ class AdminCommands(commands.Cog):
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
 
+
+    @commands.command(pass_context=True)
+    async def pzservermsg(self, ctx):
+        """Broadcast a server message"""
+        if await IsAdmin(ctx):
+            print(ctx.message.content)
+            access_split = ctx.message.content.split()
+            try:
+                access_split = access_split[1:]
+                smsg = " ".join(access_split)
+            except IndexError as ie:
+                response = f"Invalid command. Try !pzservermsg My cool message"
+                await ctx.send(response)
+                return
+            c_run = await rcon(f'servermsg "{smsg}"', host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            response = f"Sent broadcast to server"
+        else:
+            response = f"{ctx.author}, you don't have admin rights."
+        await ctx.send(response)
+
     @commands.command(pass_context=True)
     async def pzunwhitelist(self, ctx):
         """Remove a whitelisted user"""
