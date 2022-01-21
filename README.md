@@ -12,10 +12,15 @@ Make sure your PZ rcon server is listening on 27015
 
 Create a .env file in the same directory as the pzbot.py file
 ```
-RCON_PASS=MyPassword123
-DISCORD_GUILD="Discord Server Name"
-DISCORD_TOKEN=DiscordBotToken11122233
+RCON_PASS=SuperPassword
+RCON_SERVER=127.0.0.1
+RCON_PORT=27015
+DISCORD_GUILD="My Discord Server"
+DISCORD_TOKEN=CoolTokenHere
+ADMIN_ROLES="Admin, Moderator"
 ```
+
+ADMIN_ROLES are the discord server roles that will allow those users to run 'AdminCommands'
 
 Start the bot script
 
