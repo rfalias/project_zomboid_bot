@@ -1,0 +1,8 @@
+[Unit]
+Description=Project Zomboid Discord Bot
+
+[Service]
+Type=simple
+User=steam
+Group=steam
+ExecStart=/usr/bin/python3 /home/steam/pz_bot/pzbot.py
