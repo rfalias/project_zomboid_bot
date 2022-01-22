@@ -29,6 +29,7 @@ ADMIN_ROLES are the discord server roles that will allow those users to run 'Adm
 
 Start the bot script
 
+Default settings are setup to work with this installer: https://github.com/rfalias/project_zomboid_installer
 # Usage
 ```
 AdminCommands:
