@@ -146,6 +146,28 @@ class AdminCommands(commands.Cog):
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
 
+
+    @commands.command(pass_context=True)
+    async def pzteleport(self, ctx):
+        """Teleport a user to another user"""
+        await IsChannelAllowed(ctx)
+        if await IsAdmin(ctx):
+            print(ctx.message.content)
+            access_split = ctx.message.content.split()
+            user = ""
+            try:
+                usera = access_split[1]
+                userb = access_split[2]  
+            except IndexError as ie:
+                response = f"Invalid command. Try !pzteleport USERA to USERB"
+                await ctx.send(response)
+                return
+            c_run = await rcon_command(ctx,[f"teleport", f"{usera}",f"{userb}"])
+            response = f"Teleported {usera} to {userb}"
+        else:
+            response = f"{ctx.author}, you don't have admin rights."
+        await ctx.send(response)
+
     @commands.command(pass_context=True)
     async def pzkick(self, ctx):
         """Kick a user"""
