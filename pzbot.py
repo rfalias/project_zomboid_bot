@@ -182,7 +182,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzkick USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon_command(ctx,[f"kickuser", "{user}"])
+            c_run = await rcon_command(ctx,[f"kickuser", f"{user}"])
             response = f"Kicked {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
