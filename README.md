@@ -22,8 +22,9 @@ RCON_PORT=27015
 DISCORD_GUILD="My Discord Server"
 DISCORD_TOKEN=CoolTokenHere
 ADMIN_ROLES="Admin, Moderator"
+LOG_PATH="/home/steamd/Zomboid/Logs"
 ```
-
+LOG_PATH should point to where the PZ server logs root is. This is how the player deaths are reported.
 ADMIN_ROLES are the discord server roles that will allow those users to run 'AdminCommands'
 
 Start the bot script
