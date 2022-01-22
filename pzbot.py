@@ -14,6 +14,7 @@
 #
 
 import os
+import socket
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import discord
@@ -21,7 +22,8 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from rcon import rcon
 from rcon import Client
-
+from subprocess import Popen
+import subprocess
 # Setup environment
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -42,10 +44,19 @@ intents = discord.Intents.default()
 intents.members = True
 block_notified = list()
 
-
 async def IsAdmin(ctx):
     is_present = [i for i in ctx.author.roles if i.name in ADMIN_ROLES]
     return is_present
+
+
+
+async def rcon_command(ctx, command):
+    p = Popen(["/home/steam/pz_bot/rcon", "-a", f"{RCONSERVER}:{RCONPORT}", "-p",RCONPASS, command], stdout=subprocess.PIPE)
+    r = p.stdout.read()
+    r = r.decode("utf-8")
+    print(r)
+    return r
+
 
 
 async def IsChannelAllowed(ctx):
@@ -56,8 +67,8 @@ async def IsChannelAllowed(ctx):
             await ctx.send("Not allowed to run commands in this channel")
             block_notified.append(channel_name)
         raise Exception("Not allowed to operate in channel")
-
-
+        results = f"Current players in game:\n{c_run}"
+        await ctx.send(results)
 class AdminCommands(commands.Cog):
     """Admin Server Commands"""
     @commands.command(pass_context=True)
@@ -80,7 +91,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid access level {level}. Muse be one of {access_levels}"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"setaccesslevel {user} {access_level}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon(f"setaccesslevel", f"{user}", f"{access_level}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
             response = f"Set access of user {user} to {access_level}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -103,7 +114,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzsteamban USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"banid {user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon(f"banid", f"{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
             response = f"Steam banned {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -123,7 +134,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzsteamunban USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"unbanid {user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon(f"unbanid", "{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
             response = f"Steam unbanned {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -143,7 +154,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzkick USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"kickuser {user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon(f"kickuser", "{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
             response = f"Kicked {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -163,7 +174,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzwhitelist USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"addusertowhitelist {user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon(f"addusertowhitelist", f"{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
             response = f"Whitelisted {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -184,7 +195,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzservermsg My cool message"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f'servermsg "{smsg}"', host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon(f'servermsg', f"{smsg}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
             response = f"Sent broadcast to server"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -204,7 +215,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzunwhitelist USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"removeuserfromwhitelist {user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon(f"removeuserfromwhitelist", f"{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
             response = f"Removed {user} from whitelist"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -246,10 +257,20 @@ class UserCommands(commands.Cog):
     async def pzplayers(self, ctx):
         """Show current active players on the server"""
         await IsChannelAllowed(ctx)
-        c_run = await rcon('players', host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+        c_run = ""
+        try:
+            c_run = await rcon_command(ctx, "players")
+        #c_run = await rcon('players', host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+        except Exception as e:
+            print(e)
+            if e == "timed out":
+                c_run = await rcon_command(ctx, "players")
         c_run = "\n".join(c_run.split('\n')[1:-1])
         results = f"Current players in game:\n{c_run}"
         await ctx.send(results)
+
+
+
 
     @commands.command(pass_context=True)
     async def pzgetoption(self, ctx):

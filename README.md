@@ -6,6 +6,10 @@ I will not go into how to setup a bot or a service for a python script here, the
 # Requirements and Setup
 Make sure you have python3-pip
 
+This requires the rcon executable in the same directory as the script
+
+https://leviwheatcroft.github.io/selfhosted-awesome-unlist/rcon-cli.html
+
 ```pip install rcon python-dotenv discord.py```
 
 Make sure your PZ rcon server is listening on 27015
