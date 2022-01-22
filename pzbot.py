@@ -23,6 +23,7 @@ from dotenv import load_dotenv
 from rcon import rcon
 from rcon import Client
 from subprocess import Popen
+import glob
 import subprocess
 # Setup environment
 load_dotenv()
@@ -32,6 +33,7 @@ RCONSERVER = os.getenv('RCON_SERVER')
 RCONPORT = os.getenv('RCON_PORT')
 GUILD = os.getenv('DISCORD_GUILD')
 ADMIN_ROLES = os.getenv('ADMIN_ROLES')
+LOG_PATH = os.getenv('LOG_PATH', "/home/steam/Zomboid/Logs")
 ADMIN_ROLES = ADMIN_ROLES.split(',')
 IGNORE_CHANNELS = os.getenv('IGNORE_CHANNELS')
 try:
@@ -43,6 +45,24 @@ access_levels = ['admin', 'none', 'moderator']
 intents = discord.Intents.default()
 intents.members = True
 block_notified = list()
+
+
+async def GetDeathCount(ctx, player):
+    deathcount = 0
+    logs = list()
+    for root, dirs, files in os.walk(LOG_PATH):
+        for f in files:
+            if "_user.txt" in f:
+                lpath = os.path.join(root,f)
+                logs.append(lpath)
+    for log in logs:
+        with open(log, 'r') as file:
+            for line in file:
+                if player.lower() in line.lower():
+                    if "died" in line:
+                        deathcount += 1
+    return f"{player} has died {deathcount} times"
+
 
 async def IsAdmin(ctx):
     is_present = [i for i in ctx.author.roles if i.name in ADMIN_ROLES]
@@ -312,6 +332,25 @@ class UserCommands(commands.Cog):
         match = '\n'.join(list(map(lambda x: x.replace('* ',''),match)))
         results = f"Server options:\n{match}"
         await ctx.send(results)
+
+
+    @commands.command(pass_context=True)
+    async def pzdeathcount(self, ctx):
+        """Get the total death count of a player"""
+        await IsChannelAllowed(ctx)
+        cmd_split = ctx.message.content.split()
+        option_find = ""
+        try:
+            username = cmd_split[1]
+        except IndexError as ie:
+            response = f"Invalid command. Try !pzdeathcount USERNAME"
+            await ctx.send(response)
+            return
+        dc = await GetDeathCount(ctx, username)
+        results = dc
+        await ctx.send(results)
+
+
 bot.add_cog(UserCommands())
 
 bot.run(TOKEN)
