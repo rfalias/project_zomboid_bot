@@ -51,7 +51,13 @@ async def IsAdmin(ctx):
 
 
 async def rcon_command(ctx, command):
-    p = Popen(["/home/steam/pz_bot/rcon", "-a", f"{RCONSERVER}:{RCONPORT}", "-p",RCONPASS, command], stdout=subprocess.PIPE)
+    c = ["/home/steam/pz_bot/rcon", "-a", f"{RCONSERVER}:{RCONPORT}", "-p",RCONPASS, ]
+    cmd = [" ".join(command)]
+    c.extend(cmd)
+    
+
+    print(c)
+    p = Popen(c, stdout=subprocess.PIPE)
     r = p.stdout.read()
     r = r.decode("utf-8")
     print(r)
@@ -91,7 +97,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid access level {level}. Muse be one of {access_levels}"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"setaccesslevel", f"{user}", f"{access_level}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx, [f"setaccesslevel", f"{user}", f"{access_level}"])
             response = f"Set access of user {user} to {access_level}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -114,7 +120,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzsteamban USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"banid", f"{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx,[f"banid", f"{user}"])
             response = f"Steam banned {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -134,7 +140,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzsteamunban USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"unbanid", "{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx,[f"unbanid", "{user}"])
             response = f"Steam unbanned {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -154,7 +160,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzkick USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"kickuser", "{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx,[f"kickuser", "{user}"])
             response = f"Kicked {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -174,7 +180,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzwhitelist USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"addusertowhitelist", f"{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx,[f"addusertowhitelist", f"{user}"])
             response = f"Whitelisted {user}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -195,7 +201,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzservermsg My cool message"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f'servermsg', f"{smsg}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx,[f'servermsg', f"{smsg}"])
             response = f"Sent broadcast to server"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -215,7 +221,7 @@ class AdminCommands(commands.Cog):
                 response = f"Invalid command. Try !pzunwhitelist USER"
                 await ctx.send(response)
                 return
-            c_run = await rcon(f"removeuserfromwhitelist", f"{user}", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx,[f"removeuserfromwhitelist", f"{user}"])
             response = f"Removed {user} from whitelist"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -228,7 +234,7 @@ class AdminCommands(commands.Cog):
         await IsChannelAllowed(ctx)
         if await IsAdmin(ctx):
             print(ctx.message.content)
-            c_run = await rcon(f"addalltowhitelist", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx,[f"addalltowhitelist"])
             response = f"Added all current users to the whitelist"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -241,7 +247,7 @@ class AdminCommands(commands.Cog):
         await IsChannelAllowed(ctx)
         if await IsAdmin(ctx):
             print(ctx.message.content)
-            c_run = await rcon(f"save", host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+            c_run = await rcon_command(ctx,[f"save"])
             response = f"World saved"
         else:
             response = f"{ctx.author}, you don't have admin rights."
@@ -258,13 +264,7 @@ class UserCommands(commands.Cog):
         """Show current active players on the server"""
         await IsChannelAllowed(ctx)
         c_run = ""
-        try:
-            c_run = await rcon_command(ctx, "players")
-        #c_run = await rcon('players', host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
-        except Exception as e:
-            print(e)
-            if e == "timed out":
-                c_run = await rcon_command(ctx, "players")
+        c_run = await rcon_command(ctx, ["players"])
         c_run = "\n".join(c_run.split('\n')[1:-1])
         results = f"Current players in game:\n{c_run}"
         await ctx.send(results)
@@ -284,7 +284,7 @@ class UserCommands(commands.Cog):
             response = f"Invalid command. Try !pzgetoption OPTIONNAME"
             await ctx.send(response)
             return
-        copt = await rcon('showoptions', host=RCONSERVER, port=RCONPORT, passwd=RCONPASS)
+        copt = await rcon_command(ctx,'showoptions')
         copt_split = copt.split('\n')
         match = list(filter(lambda x: option_find.lower() in x.lower(), copt_split))
         match = '\n'.join(list(map(lambda x: x.replace('* ',''),match)))
