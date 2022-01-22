@@ -33,13 +33,16 @@ Start the bot script
 AdminCommands:
   pzkick         Kick a user
   pzsave         Save the current world
+  pzservermsg    Broadcast a server message
   pzsetaccess    Set the access level of a specific user.
   pzsteamban     Steam ban a user
-  pzsteamunban   Steam unban user
+  pzsteamunban   Steam unban a user
+  pzteleport     Teleport a user to another user
   pzunwhitelist  Remove a whitelisted user
   pzwhitelist    Whitelist a user
   pzwhitelistall Whitelist all active users
 UserCommands:
+  pzdeathcount   Get the total death count of a player
   pzgetoption    Get the value of a server option
   pzplayers      Show current active players on the server
 ​No Category:
