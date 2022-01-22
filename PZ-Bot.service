@@ -5,4 +5,5 @@ Description=Project Zomboid Discord Bot
 Type=simple
 User=steam
 Group=steam
-ExecStart=/usr/bin/python3 /home/steam/pz_bot/pzbot.py
+WorkingDirectory=/home/steam/pz_bot/
+ExecStart=-/usr/bin/python3 /home/steam/pz_bot/pzbot.py
