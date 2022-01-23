@@ -363,7 +363,7 @@ class UserCommands(commands.Cog):
 
 bot.add_cog(UserCommands())
 
-async def pzplayers():
+async def getpzplayers():
     c_run = ""
     c_run = await rcon_command(None, ["players"])
     c_run = "\n".join(c_run.split('\n')[1:-1])
@@ -373,7 +373,7 @@ async def status_task():
     while True:
         _serverUp = await IsServerRunning()
         if _serverUp:
-            playercount = await pzplayers()
+            playercount = await getpzplayers()
             await bot.change_presence(activity=discord.Game(name=f"{playercount} survivors online"))
         else:
             await bot.change_presence(activity=discord.Game(name=f"Server offline"))
