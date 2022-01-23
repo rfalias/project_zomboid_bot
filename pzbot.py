@@ -18,13 +18,16 @@ import socket
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from rcon import rcon
 from rcon import Client
 from subprocess import Popen
 import glob
 import subprocess
+import psutil
+import schedule
+
 # Setup environment
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -36,6 +39,7 @@ ADMIN_ROLES = os.getenv('ADMIN_ROLES')
 LOG_PATH = os.getenv('LOG_PATH', "/home/steam/Zomboid/Logs")
 ADMIN_ROLES = ADMIN_ROLES.split(',')
 IGNORE_CHANNELS = os.getenv('IGNORE_CHANNELS')
+NOTIFICATION_CHANNEL = os.getenv('NOTIFICATION_CHANNEL')
 try:
     IGNORE_CHANNELS = IGNORE_CHANNELS.split(',')
 except: 
@@ -45,7 +49,7 @@ access_levels = ['admin', 'none', 'moderator']
 intents = discord.Intents.default()
 intents.members = True
 block_notified = list()
-
+client = discord.Client()
 
 async def GetDeathCount(ctx, player):
     deathcount = 0
@@ -68,6 +72,13 @@ async def IsAdmin(ctx):
     is_present = [i for i in ctx.author.roles if i.name in ADMIN_ROLES]
     return is_present
 
+
+async def IsServerRunning():
+    for proc in psutil.process_iter():
+        lname = proc.name().lower()
+        if "projectzomboid" in lname:
+           return True
+    return False
 
 
 async def rcon_command(ctx, command):
@@ -93,8 +104,8 @@ async def IsChannelAllowed(ctx):
             await ctx.send("Not allowed to run commands in this channel")
             block_notified.append(channel_name)
         raise Exception("Not allowed to operate in channel")
-        results = f"Current players in game:\n{c_run}"
-        await ctx.send(results)
+
+
 class AdminCommands(commands.Cog):
     """Admin Server Commands"""
     @commands.command(pass_context=True)
@@ -350,7 +361,27 @@ class UserCommands(commands.Cog):
         results = dc
         await ctx.send(results)
 
-
 bot.add_cog(UserCommands())
 
+async def pzplayers():
+    c_run = ""
+    c_run = await rcon_command(None, ["players"])
+    c_run = "\n".join(c_run.split('\n')[1:-1])
+    return len(c_run)
+
+async def status_task():
+    while True:
+        _serverUp = await IsServerRunning()
+        if _serverUp:
+            playercount = await pzplayers()
+            await bot.change_presence(activity=discord.Game(name=f"{playercount} survivors online"))
+        else:
+            await bot.change_presence(activity=discord.Game(name=f"Server offline"))
+        await asyncio.sleep(20)
+
+@bot.event
+async def on_ready():
+    bot.loop.create_task(status_task())
+
+print("Starting bot")
 bot.run(TOKEN)

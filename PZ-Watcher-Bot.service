@@ -1,0 +1,9 @@
+[Unit]
+Description=Project Zomboid Discord Watcher Bot
+
+[Service]
+Type=simple
+User=steam
+Group=steam
+WorkingDirectory=/home/steam/pz_bot/
+ExecStart=-/usr/bin/python3 /home/steam/pz_bot/pzwatcher.py
