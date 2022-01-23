@@ -129,7 +129,7 @@ class AdminCommands(commands.Cog):
                 await ctx.send(response)
                 return
             c_run = await rcon_command(ctx, [f"setaccesslevel", f"{user}", f"{access_level}"])
-            response = f"Set access of user {user} to {access_level}"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -152,7 +152,7 @@ class AdminCommands(commands.Cog):
                 await ctx.send(response)
                 return
             c_run = await rcon_command(ctx,[f"banid", f"{user}"])
-            response = f"Steam banned {user}"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -172,7 +172,7 @@ class AdminCommands(commands.Cog):
                 await ctx.send(response)
                 return
             c_run = await rcon_command(ctx,[f"unbanid", "{user}"])
-            response = f"Steam unbanned {user}"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -194,7 +194,7 @@ class AdminCommands(commands.Cog):
                 await ctx.send(response)
                 return
             c_run = await rcon_command(ctx,[f"teleport", f"{usera}",f"{userb}"])
-            response = f"Teleported {usera} to {userb}"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -214,7 +214,7 @@ class AdminCommands(commands.Cog):
                 await ctx.send(response)
                 return
             c_run = await rcon_command(ctx,[f"kickuser", f"{user}"])
-            response = f"Kicked {user}"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -234,7 +234,7 @@ class AdminCommands(commands.Cog):
                 await ctx.send(response)
                 return
             c_run = await rcon_command(ctx,[f"addusertowhitelist", f"{user}"])
-            response = f"Whitelisted {user}"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -255,7 +255,7 @@ class AdminCommands(commands.Cog):
                 await ctx.send(response)
                 return
             c_run = await rcon_command(ctx,[f'servermsg', f"{smsg}"])
-            response = f"Sent broadcast to server"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -275,7 +275,7 @@ class AdminCommands(commands.Cog):
                 await ctx.send(response)
                 return
             c_run = await rcon_command(ctx,[f"removeuserfromwhitelist", f"{user}"])
-            response = f"Removed {user} from whitelist"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -288,7 +288,7 @@ class AdminCommands(commands.Cog):
         if await IsAdmin(ctx):
             print(ctx.message.content)
             c_run = await rcon_command(ctx,[f"addalltowhitelist"])
-            response = f"Added all current users to the whitelist"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -301,7 +301,7 @@ class AdminCommands(commands.Cog):
         if await IsAdmin(ctx):
             print(ctx.message.content)
             c_run = await rcon_command(ctx,[f"save"])
-            response = f"World saved"
+            response = f"{c_run}"
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
@@ -363,7 +363,7 @@ class UserCommands(commands.Cog):
 
 bot.add_cog(UserCommands())
 
-async def getpzplayers():
+async def pzplayers():
     c_run = ""
     c_run = await rcon_command(None, ["players"])
     c_run = "\n".join(c_run.split('\n')[1:-1])
@@ -373,7 +373,7 @@ async def status_task():
     while True:
         _serverUp = await IsServerRunning()
         if _serverUp:
-            playercount = await getpzplayers()
+            playercount = await pzplayers()
             await bot.change_presence(activity=discord.Game(name=f"{playercount} survivors online"))
         else:
             await bot.change_presence(activity=discord.Game(name=f"Server offline"))
