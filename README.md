@@ -22,24 +22,29 @@ RCON_PORT=27015
 DISCORD_GUILD="My Discord Server"
 DISCORD_TOKEN=CoolTokenHere
 ADMIN_ROLES="Admin, Moderator"
+LOG_PATH="/home/steamd/Zomboid/Logs"
 ```
-
+LOG_PATH should point to where the PZ server logs root is. This is how the player deaths are reported.
 ADMIN_ROLES are the discord server roles that will allow those users to run 'AdminCommands'
 
 Start the bot script
 
+Default settings are setup to work with this installer: https://github.com/rfalias/project_zomboid_installer
 # Usage
 ```
 AdminCommands:
   pzkick         Kick a user
   pzsave         Save the current world
+  pzservermsg    Broadcast a server message
   pzsetaccess    Set the access level of a specific user.
   pzsteamban     Steam ban a user
-  pzsteamunban   Steam unban user
+  pzsteamunban   Steam unban a user
+  pzteleport     Teleport a user to another user
   pzunwhitelist  Remove a whitelisted user
   pzwhitelist    Whitelist a user
   pzwhitelistall Whitelist all active users
 UserCommands:
+  pzdeathcount   Get the total death count of a player
   pzgetoption    Get the value of a server option
   pzplayers      Show current active players on the server
 ​No Category:
