@@ -3,6 +3,15 @@ Discord bot for managing your PZ server.
 
 I will not go into how to setup a bot or a service for a python script here, there are tons of guides already
 
+
+pzbot.py - Handles all commands and server communication. It also will handle the bot status changing and updating. 
+
+
+pzwatcher.py - Will watch logs and report ingame activities to specified channels
+
+
+You can use one or the other, or both.
+
 # Requirements and Setup
 Make sure you have python3-pip
 
@@ -23,9 +32,17 @@ DISCORD_GUILD="My Discord Server"
 DISCORD_TOKEN=CoolTokenHere
 ADMIN_ROLES="Admin, Moderator"
 LOG_PATH="/home/steamd/Zomboid/Logs"
+NOTIFICATION_CHANNEL="123123211"
+INGAME_CHANNEL="123123123123213"
+PROCESS_NAME="ProjectZomboid64"
 ```
 LOG_PATH should point to where the PZ server logs root is. This is how the player deaths are reported.
 ADMIN_ROLES are the discord server roles that will allow those users to run 'AdminCommands'
+
+
+INGAME_CHANNEL is the channel that project zomboid is attached to, and it gets excluded from command runs
+
+NOTIFICATION_CHANNEL will send player death and join/leave notification
 
 Start the bot script
 
