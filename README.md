@@ -9,6 +9,7 @@ pzbot.py - Handles all commands and server communication. It also will handle th
 
 pzwatcher.py - Will watch logs and report ingame activities to specified channels
 
+### This must be locally hosted on your PZ server due to the interactions it requires to get specific information
 
 You can use one or the other, or both.
 
@@ -19,7 +20,7 @@ This requires the rcon executable in the same directory as the script
 
 https://leviwheatcroft.github.io/selfhosted-awesome-unlist/rcon-cli.html
 
-```pip install rcon python-dotenv discord.py```
+```pip install rcon python-dotenv discord.py psutil watchgod file_read_backwards```
 
 Make sure your PZ rcon server is listening on 27015
 
