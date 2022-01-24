@@ -376,9 +376,10 @@ async def status_task():
         if _serverUp:
             playercount = await pzplayers()
             print(playercount)
-            await bot.change_presence(activity=discord.Game(name=f"{playercount} survivors online"))
+            
+            await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{playercount} survivors online"))
         else:
-            await bot.change_presence(activity=discord.Game(name=f"Server offline"))
+            await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"Server offline"))
         await asyncio.sleep(20)
 
 @bot.event
