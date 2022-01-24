@@ -53,7 +53,8 @@ https://leviwheatcroft.github.io/selfhosted-awesome-unlist/rcon-cli.html
 
 Make sure your PZ rcon server is listening on 27015
 
-Create a .env file in the same directory as the pzbot.py file
+Create a .env file in the same directory as the pzbot.py file  
+All of these should be filled out. To get channel id's, enable dev mode on your discord app, and right click a channel and click 'copy id'   
 ```
 RCON_PASS=SuperPassword
 RCON_SERVER=127.0.0.1
@@ -65,6 +66,8 @@ LOG_PATH="/home/steamd/Zomboid/Logs"
 NOTIFICATION_CHANNEL="123123211"
 INGAME_CHANNEL="123123123123213"
 PROCESS_NAME="ProjectZomboid64"
+WHITELIST_ROLES="Survivor"
+SERVER_ADDRESS="69.164.202.83:16261"
 ```
 LOG_PATH should point to where the PZ server logs root is. This is how the player deaths are reported.
 
@@ -73,6 +76,10 @@ ADMIN_ROLES are the discord server roles that will allow those users to run 'Adm
 INGAME_CHANNEL is the channel that project zomboid is attached to, and it gets excluded from command runs
 
 NOTIFICATION_CHANNEL will send player death and join/leave notification
+
+WHITELIST_ROLES="Survivor" - The role name of users that can request accounts on the pz server
+
+SERVER_ADDRESS="1.2.3.4:16261"
 
 Start the bot script
 
