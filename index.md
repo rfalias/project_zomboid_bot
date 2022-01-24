@@ -17,7 +17,12 @@ Limit administrative server commands to users with specific discord roles
 ![permissions](/project_zomboid_bot/docs/assets/images/permissions.png)  
 
 Give players insight into their time on the server, like death counts (more to come here):  
-![deathcount](/project_zomboid_bot/docs/assets/images/deathcount.PNG)
+![deathcount](/project_zomboid_bot/docs/assets/images/deathcount.PNG)  
+
+
+#### User Self Service
+Players with the correct role can request access to the server whitelist via a command  
+The bot will DM them with their new password and connection information to the server  
 
 
 ### This must be locally hosted on your PZ server due to the interactions it requires to get specific information
