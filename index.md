@@ -1,6 +1,8 @@
-# project_zomboid_bot
-Discord bot for managing your PZ server. 
+# Project Zomboid Discord Bot
+Discord bot for managing your PZ server and enabling player interactions
+
 ![spiffo](/project_zomboid_bot/docs/assets/images/Spiffoskip.png)
+
 ### This must be locally hosted on your PZ server due to the interactions it requires to get specific information
 
 I will not go into how to setup a bot or a service for a python script here, there are tons of guides already
