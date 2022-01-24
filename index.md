@@ -13,7 +13,7 @@ Join and leave announcements
 ![zombot](/project_zomboid_bot/docs/assets/images/joined.png)
 
 ## Role based commands
-Limit administrative server functions to commands with discord roles  
+Limit administrative server commands to users with specific discord roles  
 ![permissions](/project_zomboid_bot/docs/assets/images/permissions.png)  
 
 Give players insight into their time on the server, like death counts (more to come here):  
