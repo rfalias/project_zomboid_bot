@@ -12,7 +12,7 @@ or 'Offline' if the server is currently down
 Join and leave announcements  
 ![zombot](/project_zomboid_bot/docs/assets/images/joined.png)
 
-## Role based commands
+#### Role based commands
 Limit administrative server commands to users with specific discord roles  
 ![permissions](/project_zomboid_bot/docs/assets/images/permissions.png)  
 
