@@ -6,7 +6,7 @@ Discord bot for managing your PZ server and enabling player interactions
 # Features
 ## Bot status displays the server status. Either offline, or player count ingame:
 Bot updates it's status with either the current count of players ingame  
-or 'Offline' if the server is currently down
+or 'Offline' if the server is currently down  
 ![zombot](/project_zomboid_bot/docs/assets/images/zombot.PNG)
 
 Join and leave announcements  
