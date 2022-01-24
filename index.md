@@ -3,9 +3,24 @@ Discord bot for managing your PZ server and enabling player interactions
 
 ![spiffo](/project_zomboid_bot/docs/assets/images/Spiffoskip.png)
 
-### This must be locally hosted on your PZ server due to the interactions it requires to get specific information
+# Features
+## Bot status displays the server status. Either offline, or player count ingame:
+Bot updates it's status with either the current count of players ingame  
+or 'Offline' if the server is currently down
+![zombot](/project_zomboid_bot/docs/assets/images/zombot.PNG)
 
-I will not go into how to setup a bot or a service for a python script here, there are tons of guides already
+## Role based commands
+Limit administrative server functions to commands with discord roles  
+![permissions](/project_zomboid_bot/docs/assets/images/permissions.png)  
+
+Give players insight into their time on the server, like death counts (more to come here):  
+![deathcount](/project_zomboid_bot/docs/assets/images/deathcount.PNG)
+
+
+### This must be locally hosted on your PZ server due to the interactions it requires to get specific information
+Due to how this bot interacts with the server for specific information (rcon, log files, active processes) it must be running on the server that runs project zomboid
+
+I will not go into how to setup a bot or a service for a python script here, there are tons of guides already, but have included basic unit files for this bot
 
 
 pzbot.py - Handles all commands and server communication. It also will handle the bot status changing and updating. 
@@ -85,6 +100,8 @@ Admin commands can only be run by users in discord with the "Admin" role.
 !pzsetaccess SomeUser admin
 
 ## Get a server option
+Does a fuzzy lookup for a specific server option
+
 !pzgetoption zombie
 ```
 Server options:
