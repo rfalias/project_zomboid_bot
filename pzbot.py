@@ -377,7 +377,7 @@ class UserCommands(commands.Cog):
                 response = f"Invalid command. Try !pzrequestaccess USER"
                 await ctx.send(response)
                 return 
-            password = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+            password = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(8))
             
             c_run = await rcon_command(ctx,[f"adduser {user} {password}"])
             response = f"{c_run}"
