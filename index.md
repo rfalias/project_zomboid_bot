@@ -9,6 +9,9 @@ Bot updates it's status with either the current count of players ingame
 or 'Offline' if the server is currently down
 ![zombot](/project_zomboid_bot/docs/assets/images/zombot.PNG)
 
+Join and leave announcements  
+![zombot](/project_zomboid_bot/docs/assets/images/joined.png)
+
 ## Role based commands
 Limit administrative server functions to commands with discord roles  
 ![permissions](/project_zomboid_bot/docs/assets/images/permissions.png)  
