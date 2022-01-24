@@ -60,23 +60,25 @@ async def logwatcher():
 
 async def PlayerCheck(lfile, channel):
     count = 0
-    with FileReadBackwards(lfile) as frb:
-        for l in frb:
-            ls = l.split()
-            if "disconnected player" in l:
-                user = ls[3].strip('"')
-                await channel.send(f"{user} has disconnected!")
-                return f"{user} has disconnected!"
-            if "fully connected" in l:
-                user = ls[3].strip('"')
-                await channel.send(f"{user} has joined!")
-                return f"{user} has joined!"
-            if " died at " in l:
-                user = ls[3].trim()
-                await channel.send(f"{user} has died!")
-                return f"{user} has died!"
-            break
-
+    try:
+        with FileReadBackwards(lfile) as frb:
+            for l in frb:
+                ls = l.split()
+                if "disconnected player" in l:
+                    user = ls[3].strip('"')
+                    await channel.send(f"{user} has disconnected!")
+                    return f"{user} has disconnected!"
+                if "fully connected" in l:
+                    user = ls[3].strip('"')
+                    await channel.send(f"{user} has joined!")
+                    return f"{user} has joined!"
+                if " died at " in l:
+                    user = ls[3].trim()
+                    await channel.send(f"{user} has died!")
+                    return f"{user} has died!"
+                break
+    except:
+        print("Couldn't read file")
 async def DeathCheck(lfile):
     with FileReadBackwards(lfile) as frb:
         for l in frb:
