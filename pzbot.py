@@ -12,7 +12,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
+import string
 import os
 import socket
 import asyncio
@@ -27,6 +27,7 @@ import glob
 import subprocess
 import psutil
 import schedule
+import random
 
 # Setup environment
 load_dotenv()
@@ -36,9 +37,12 @@ RCONSERVER = os.getenv('RCON_SERVER')
 RCONPORT = os.getenv('RCON_PORT')
 GUILD = os.getenv('DISCORD_GUILD')
 ADMIN_ROLES = os.getenv('ADMIN_ROLES')
+WHITELIST_ROLES = os.getenv('WHITELIST_ROLES')
 LOG_PATH = os.getenv('LOG_PATH', "/home/steam/Zomboid/Logs")
 ADMIN_ROLES = ADMIN_ROLES.split(',')
+WHITELIST_ROLES = WHITELIST_ROLES.split(',')
 IGNORE_CHANNELS = os.getenv('IGNORE_CHANNELS')
+SERVER_ADDRESS = os.getenv('SERVER_ADDRESS')
 NOTIFICATION_CHANNEL = os.getenv('NOTIFICATION_CHANNEL')
 try:
     IGNORE_CHANNELS = IGNORE_CHANNELS.split(',')
@@ -360,6 +364,33 @@ class UserCommands(commands.Cog):
         dc = await GetDeathCount(ctx, username)
         results = dc
         await ctx.send(results)
+
+    @commands.command(pass_context=True)
+    async def pzrequestaccess(self, ctx):
+        is_present = [i for i in ctx.author.roles if i.name in WHITELIST_ROLES]
+        if is_present:
+            access_split = ctx.message.content.split()
+            user = ""
+            try:
+                user = access_split[1]
+            except IndexError as ie:
+                response = f"Invalid command. Try !pzrequestaccess USER"
+                await ctx.send(response)
+                return 
+            password = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+            
+            c_run = await rcon_command(ctx,[f"adduser {user} {password}"])
+            response = f"{c_run}"
+            if "exists" in response:
+                await ctx.message.author.send(f"Unable to create user, try another name")
+                return
+            if "created" in response:
+                await ctx.message.author.send(f"Your request was accepted.\nUsername: {user}\nPassword:{password}\nAddress:{SERVER_ADDRESS}")
+                return
+        else:
+            await ctx.message.author.send(f"You have not been given access to the server yet\nPlease wait for an admin to authorize you")
+            return
+            #await ctx.message.author.send(f"Your request user {user} has been created\nPassword: password\nServer Address: {SERVER_ADDRESS}")
 
 bot.add_cog(UserCommands())
 
