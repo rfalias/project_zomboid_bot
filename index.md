@@ -1,37 +1,92 @@
-## Welcome to GitHub Pages
+# project_zomboid_bot
+Discord bot for managing your PZ server. 
+### This must be locally hosted on your PZ server due to the interactions it requires to get specific information
 
-You can use the [editor on GitHub](https://github.com/rfalias/project_zomboid_bot/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+I will not go into how to setup a bot or a service for a python script here, there are tons of guides already
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-### Markdown
+pzbot.py - Handles all commands and server communication. It also will handle the bot status changing and updating. 
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+pzwatcher.py - Will watch logs and report ingame activities to specified channels
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
+You can use one or the other, or both.
 
-1. Numbered
-2. List
+# Requirements and Setup
+Make sure you have python3-pip
 
-**Bold** and _Italic_ and `Code` text
+This requires the rcon executable in the same directory as the script
 
-[Link](url) and ![Image](src)
+https://leviwheatcroft.github.io/selfhosted-awesome-unlist/rcon-cli.html
+
+```pip install rcon python-dotenv discord.py psutil watchgod file_read_backwards```
+
+Make sure your PZ rcon server is listening on 27015
+
+Create a .env file in the same directory as the pzbot.py file
+```
+RCON_PASS=SuperPassword
+RCON_SERVER=127.0.0.1
+RCON_PORT=27015
+DISCORD_GUILD="My Discord Server"
+DISCORD_TOKEN=CoolTokenHere
+ADMIN_ROLES="Admin, Moderator"
+LOG_PATH="/home/steamd/Zomboid/Logs"
+NOTIFICATION_CHANNEL="123123211"
+INGAME_CHANNEL="123123123123213"
+PROCESS_NAME="ProjectZomboid64"
+```
+LOG_PATH should point to where the PZ server logs root is. This is how the player deaths are reported.
+
+ADMIN_ROLES are the discord server roles that will allow those users to run 'AdminCommands'
+
+INGAME_CHANNEL is the channel that project zomboid is attached to, and it gets excluded from command runs
+
+NOTIFICATION_CHANNEL will send player death and join/leave notification
+
+Start the bot script
+
+Default settings are setup to work with this installer: https://github.com/rfalias/project_zomboid_installer
+# Usage
+```
+AdminCommands:
+  pzkick         Kick a user
+  pzsave         Save the current world
+  pzservermsg    Broadcast a server message
+  pzsetaccess    Set the access level of a specific user.
+  pzsteamban     Steam ban a user
+  pzsteamunban   Steam unban a user
+  pzteleport     Teleport a user to another user
+  pzunwhitelist  Remove a whitelisted user
+  pzwhitelist    Whitelist a user
+  pzwhitelistall Whitelist all active users
+UserCommands:
+  pzdeathcount   Get the total death count of a player
+  pzgetoption    Get the value of a server option
+  pzplayers      Show current active players on the server
+​No Category:
+  help           Shows this message
+
+Type !help command for more info on a command.
+You can also type !help category for more info on a category.
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+# Examples
+Admin commands can only be run by users in discord with the "Admin" role. 
 
-### Jekyll Themes
+## Ban a user
+!pzsteamban SteamIDOfUser
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/rfalias/project_zomboid_bot/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## Make a user an admin
+!pzsetaccess SomeUser admin
 
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+## Get a server option
+!pzgetoption zombie
+```
+Server options:
+ZombieUpdateDelta=0.5
+ZombieUpdateMaxHighPriority=50
+ZombieUpdateRadiusHighPriority=10.0
+ZombieUpdateRadiusLowPriority=45.0
+```
