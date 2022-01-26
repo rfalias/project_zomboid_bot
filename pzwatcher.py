@@ -53,7 +53,7 @@ async def logwatcher():
             found_files.append(p[1])
         user_paths = list(filter(lambda x: "_user.txt" in x, found_files))
         for x in user_paths:
-            player_check = await PlayerCheck(x, ichannel)
+            player_check = await PlayerCheck(x, nchannel)
 
             #await ichannel.send(player_check)
 
@@ -94,3 +94,5 @@ async def IsAdmin(ctx):
 
 client.loop.create_task(logwatcher())
 client.run(TOKEN)
+print("Starting bot")
+bot.run(TOKEN)

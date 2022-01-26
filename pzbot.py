@@ -84,6 +84,18 @@ async def getmods():
                         modlist.append(mod)
     return "\n".join(modlist)
 
+
+async def lookupsteamid(name):
+    for root, dirs, files in os.walk(LOG_PATH):
+        for f in files:
+            if "_user.txt" in f:
+                lpath = os.path.join(root,f) 
+                with open(lpath, 'r') as file:
+                    for line in file:
+                        if "fully connected" in line:
+                            if name in line:
+                                return line.split()[2]
+    
 async def IsAdmin(ctx):
     is_present = [i for i in ctx.author.roles if i.name in ADMIN_ROLES]
     return is_present
@@ -321,6 +333,26 @@ class AdminCommands(commands.Cog):
         else:
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
+
+    @commands.command(pass_context=True)
+    async def pzgetsteamid(self,ctx):
+        """Lookup steamid of user"""
+        await IsChannelAllowed(ctx)
+        if await IsAdmin(ctx):
+            print(ctx.message.content)
+            access_split = ctx.message.content.split()
+            user = ""
+            try:
+                user = access_split[1]
+            except IndexError as ie:
+                response = f"Invalid command. Try !pzunwhitelist USER"
+                await ctx.send(response)
+                return
+            c_run = await lookupsteamid(user)
+            response = f"{c_run}"
+        else:
+            response = f"{ctx.author}, you don't have admin rights."
+        await ctx.send(response)  
 
 
 bot.add_cog(AdminCommands())
