@@ -94,5 +94,3 @@ async def IsAdmin(ctx):
 
 client.loop.create_task(logwatcher())
 client.run(TOKEN)
-print("Starting bot")
-bot.run(TOKEN)
