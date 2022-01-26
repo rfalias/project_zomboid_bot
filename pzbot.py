@@ -72,6 +72,18 @@ async def GetDeathCount(ctx, player):
     return f"{player} has died {deathcount} times"
 
 
+async def getmods():
+    modlist = list()
+    with open(os.path.join(os.path.split(LOG_PATH)[0],"Server","servertest.ini"), 'r') as file:
+        for line in file:
+            if "Mods=" in line:
+                mods_split = line.split("=")
+                if len(mods_split) > 1:
+                    mods_list_split = mods_split[1].split(';')
+                    for mod in mods_list_split:
+                        modlist.append(mod)
+    return "\n".join(modlist)
+
 async def IsAdmin(ctx):
     is_present = [i for i in ctx.author.roles if i.name in ADMIN_ROLES]
     return is_present
@@ -366,7 +378,17 @@ class UserCommands(commands.Cog):
         await ctx.send(results)
 
     @commands.command(pass_context=True)
+    async def pzlistmods(self, ctx):
+        """List currently installed mods"""
+        await IsChannelAllowed(ctx)
+        cmd_split = ctx.message.content.split()
+        gm = await getmods()
+        results = f"Currently installed mods:\n{gm}"
+        await ctx.send(results)
+
+    @commands.command(pass_context=True)
     async def pzrequestaccess(self, ctx):
+        """Request access to the PZ server. A password will be DMd to you. These are hashed and can only be sent once"""
         is_present = [i for i in ctx.author.roles if i.name in WHITELIST_ROLES]
         if is_present:
             access_split = ctx.message.content.split()
