@@ -72,6 +72,32 @@ async def GetDeathCount(ctx, player):
     return f"{player} has died {deathcount} times"
 
 
+async def getalldeaths(ctx):
+    deathcount = 0
+    logs = list()
+    deathdict = {}
+    for root, dirs, files in os.walk(LOG_PATH):
+        for f in files:
+            if "_user.txt" in f:
+                lpath = os.path.join(root,f)
+                logs.append(lpath)
+    for log in logs:
+        with open(log, 'r') as file:
+            for line in file:
+                if "died at (" in line:
+                    player = line.split()[3]
+                    if player in deathdict:
+                        deathdict[player] += 1
+                    else:
+                        deathdict[player] = 1
+    rstring = ""
+    for x in deathdict:
+        p = x
+        c = deathdict[x]
+        rstring += f"{p} has died {c} times\n"
+    return rstring
+
+
 async def getmods():
     modlist = list()
     with open(os.path.join(os.path.split(LOG_PATH)[0],"Server","servertest.ini"), 'r') as file:
@@ -410,6 +436,16 @@ class UserCommands(commands.Cog):
         await ctx.send(results)
 
     @commands.command(pass_context=True)
+    async def pzdeaths(self, ctx):
+        """Get the total death count of al players"""
+        await IsChannelAllowed(ctx)
+        cmd_split = ctx.message.content.split()
+        option_find = ""
+        dc = await getalldeaths(ctx)
+        results = dc
+        await ctx.send(results)
+
+    @commands.command(pass_context=True)
     async def pzlistmods(self, ctx):
         """List currently installed mods"""
         await IsChannelAllowed(ctx)
@@ -439,7 +475,7 @@ class UserCommands(commands.Cog):
                 await ctx.message.author.send(f"Unable to create user, try another name")
                 return
             if "created" in response:
-                await ctx.message.author.send(f"Your request was accepted.\nUsername: {user}\nPassword:{password}\nAddress:{SERVER_ADDRESS}")
+                await ctx.message.author.send(f"Your request was accepted.\nUsername: {user}\nPassword: {password}\nAddress: {SERVER_ADDRESS}")
                 return
         else:
             await ctx.message.author.send(f"You have not been given access to the server yet\nPlease wait for an admin to authorize you")
