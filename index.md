@@ -47,7 +47,8 @@ You can use one or the other, or both.
 # Requirements and Setup
 Make sure you have python3-pip
 
-This requires the rcon executable in the same directory as the script
+This requires the rcon executable in the same directory as the script  
+**Yes, I tried using python rcon, and python-valve but it did not work and consistently timed out talking to the pz server**
 
 https://leviwheatcroft.github.io/selfhosted-awesome-unlist/rcon-cli.html
 
