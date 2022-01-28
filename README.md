@@ -1,31 +1,28 @@
 # Project Zomboid Discord Bot
 Discord bot for managing your PZ server and enabling player interactions
 
-![spiffo](/project_zomboid_bot/docs/assets/images/Spiffoskip.png)
 
 # Features
 #### Bot status displays the server status. Either offline, or player count ingame:
 Bot updates it's status with either the current count of players ingame  
 or 'Offline' if the server is currently down  
-![zombot](/project_zomboid_bot/docs/assets/images/zombot.PNG)
 
 Join and leave announcements  
-![zombot](/project_zomboid_bot/docs/assets/images/joined.png)
 
 #### Role based commands
 Limit administrative server commands to users with specific discord roles  
-![permissions](/project_zomboid_bot/docs/assets/images/permissions.png)  
+ 
 
 Moderators can do everything except elevate to admin
 
 Give players insight into their time on the server, like death counts (more to come here):  
-![deathcount](/project_zomboid_bot/docs/assets/images/deathcount.PNG)  
+
 
 
 #### User Self Service
 Players with the correct role can request access to the server whitelist via a command  
 The bot will DM them with their new password and connection information to the server  
-![access](/project_zomboid_bot/docs/assets/images/access.png)  
+
 ```
 !pzrequestaccess someuser  
 ```
@@ -47,7 +44,8 @@ You can use one or the other, or both.
 # Requirements and Setup
 Make sure you have python3-pip
 
-This requires the rcon executable in the same directory as the script
+This requires the rcon executable in the same directory as the script  
+Yes, I tried using python rcon, and python-valve but it did not work and consistently timed out talking to the pz server
 
 https://leviwheatcroft.github.io/selfhosted-awesome-unlist/rcon-cli.html
 
