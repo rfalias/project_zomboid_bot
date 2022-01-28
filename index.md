@@ -16,6 +16,8 @@ Join and leave announcements
 Limit administrative server commands to users with specific discord roles  
 ![permissions](/project_zomboid_bot/docs/assets/images/permissions.png)  
 
+Moderators can do everything except elevate to admin
+
 Give players insight into their time on the server, like death counts (more to come here):  
 ![deathcount](/project_zomboid_bot/docs/assets/images/deathcount.PNG)  
 
@@ -87,22 +89,27 @@ Default settings are setup to work with this installer: https://github.com/rfali
 # Usage
 ```
 AdminCommands:
-  pzkick         Kick a user
-  pzsave         Save the current world
-  pzservermsg    Broadcast a server message
-  pzsetaccess    Set the access level of a specific user.
-  pzsteamban     Steam ban a user
-  pzsteamunban   Steam unban a user
-  pzteleport     Teleport a user to another user
-  pzunwhitelist  Remove a whitelisted user
-  pzwhitelist    Whitelist a user
-  pzwhitelistall Whitelist all active users
+  pzsetaccess     Set the access level of a specific user.
+ModeratorCommands:
+  pzgetsteamid    Lookup steamid of user
+  pzkick          Kick a user
+  pzsave          Save the current world
+  pzservermsg     Broadcast a server message
+  pzsteamban      Steam ban a user
+  pzsteamunban    Steam unban a user
+  pzteleport      Teleport a user to another user
+  pzunwhitelist   Remove a whitelisted user
+  pzwhitelist     Whitelist a user
+  pzwhitelistall  Whitelist all active users
 UserCommands:
-  pzdeathcount   Get the total death count of a player
-  pzgetoption    Get the value of a server option
-  pzplayers      Show current active players on the server
+  pzdeathcount    Get the total death count of a player
+  pzdeaths        Get the total death count of al players
+  pzgetoption     Get the value of a server option
+  pzlistmods      List currently installed mods
+  pzplayers       Show current active players on the server
+  pzrequestaccess Request access to the PZ server. A password will be DMd to ...
 ​No Category:
-  help           Shows this message
+  help            Shows this message
 
 Type !help command for more info on a command.
 You can also type !help category for more info on a category.
