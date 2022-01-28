@@ -37,6 +37,7 @@ RCONSERVER = os.getenv('RCON_SERVER')
 RCONPORT = os.getenv('RCON_PORT')
 GUILD = os.getenv('DISCORD_GUILD')
 ADMIN_ROLES = os.getenv('ADMIN_ROLES')
+MODERATOR_ROLES = os.getenv('MODERATOR_ROLES')
 WHITELIST_ROLES = os.getenv('WHITELIST_ROLES')
 LOG_PATH = os.getenv('LOG_PATH', "/home/steam/Zomboid/Logs")
 ADMIN_ROLES = ADMIN_ROLES.split(',')
@@ -126,6 +127,9 @@ async def IsAdmin(ctx):
     is_present = [i for i in ctx.author.roles if i.name in ADMIN_ROLES]
     return is_present
 
+async def IsMod(ctx):
+    is_present = [i for i in ctx.author.roles if i.name in MODERATOR_ROLES]
+    return is_present
 
 async def IsServerRunning():
     for proc in psutil.process_iter():
@@ -159,11 +163,11 @@ async def IsChannelAllowed(ctx):
             block_notified.append(channel_name)
         raise Exception("Not allowed to operate in channel")
 
-
 class AdminCommands(commands.Cog):
-    """Admin Server Commands"""
+    """Moderator Server Commands"""
+
     @commands.command(pass_context=True)
-    async def pzsetaccess(self, ctx): 
+    async def pzsetaccess(self, ctx):
         """Set the access level of a specific user."""
         await IsChannelAllowed(ctx)
         if await IsAdmin(ctx):
@@ -189,13 +193,16 @@ class AdminCommands(commands.Cog):
         await ctx.send(response)
 
 
+class ModeratorCommands(commands.Cog):
+    """Moderator Server Commands"""
+
     @commands.command(pass_context=True)
     async def pzsteamban(self, ctx):
         """Steam ban a user"""
         await IsChannelAllowed(ctx)
         if not await IsChannelAllowed(ctx):
             return
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
@@ -215,7 +222,7 @@ class AdminCommands(commands.Cog):
     async def pzsteamunban(self, ctx):
         """Steam unban a user"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
@@ -236,7 +243,7 @@ class AdminCommands(commands.Cog):
     async def pzteleport(self, ctx):
         """Teleport a user to another user"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
@@ -257,7 +264,7 @@ class AdminCommands(commands.Cog):
     async def pzkick(self, ctx):
         """Kick a user"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
@@ -277,7 +284,7 @@ class AdminCommands(commands.Cog):
     async def pzwhitelist(self, ctx):
         """Whitelist a user"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
@@ -298,7 +305,7 @@ class AdminCommands(commands.Cog):
     async def pzservermsg(self, ctx):
         """Broadcast a server message"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             access_split = ctx.message.content.split()
             try:
@@ -318,7 +325,7 @@ class AdminCommands(commands.Cog):
     async def pzunwhitelist(self, ctx):
         """Remove a whitelisted user"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
@@ -339,7 +346,7 @@ class AdminCommands(commands.Cog):
     async def pzwhitelistall(self, ctx):
         """Whitelist all active users"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             c_run = await rcon_command(ctx,[f"addalltowhitelist"])
             response = f"{c_run}"
@@ -352,7 +359,7 @@ class AdminCommands(commands.Cog):
     async def pzsave(self, ctx):
         """Save the current world"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             c_run = await rcon_command(ctx,[f"save"])
             response = f"{c_run}"
@@ -364,7 +371,7 @@ class AdminCommands(commands.Cog):
     async def pzgetsteamid(self,ctx):
         """Lookup steamid of user"""
         await IsChannelAllowed(ctx)
-        if await IsAdmin(ctx):
+        if await IsMod(ctx):
             print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
@@ -382,7 +389,7 @@ class AdminCommands(commands.Cog):
 
 
 bot.add_cog(AdminCommands())
-
+bot.add_cog(ModeratorCommands())
 
 class UserCommands(commands.Cog):
     """Commands open to users"""
