@@ -53,9 +53,8 @@ async def logwatcher():
             found_files.append(p[1])
         user_paths = list(filter(lambda x: "_user.txt" in x, found_files))
         for x in user_paths:
+            print(f"Checking {x} for deaths and player join")
             player_check = await PlayerCheck(x, nchannel)
-
-            #await ichannel.send(player_check)
 
 
 async def PlayerCheck(lfile, channel):
@@ -63,27 +62,31 @@ async def PlayerCheck(lfile, channel):
     try:
         with FileReadBackwards(lfile) as frb:
             for l in frb:
+                print(l)
                 ls = l.split()
                 if "disconnected player" in l:
+                    print("at dc")
+                    print(l)
                     user = ls[3].strip('"')
                     await channel.send(f"{user} has disconnected!")
-                    return f"{user} has disconnected!"
+                    break
                 if "fully connected" in l:
+                    print("Connected")
+                    print(l)
                     user = ls[3].strip('"')
                     await channel.send(f"{user} has joined!")
-                    return f"{user} has joined!"
-                if " died at " in l:
-                    user = ls[3].trim()
+                    break
+                if "died at (" in l:
+                    print("At Died")
+                    print(l)
+
+                    user = ls[3].strip('"')
                     await channel.send(f"{user} has died!")
-                    return f"{user} has died!"
+                    break
                 break
-    except:
-        print("Couldn't read file")
-async def DeathCheck(lfile):
-    with FileReadBackwards(lfile) as frb:
-        for l in frb:
-            print(l)
-            break
+    except Exception as e:
+        print(e)
+
 
 
 async def IsAdmin(ctx):
