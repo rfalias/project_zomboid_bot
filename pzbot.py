@@ -96,6 +96,7 @@ async def getalldeaths(ctx):
         p = x
         c = deathdict[x]
         rstring += f"{p} has died {c} times\n"
+    print(rstring)
     return rstring
 
 
@@ -138,6 +139,12 @@ async def IsServerRunning():
            return True
     return False
 
+async def restart_server(ctx):
+    c = ["sudo", "/usr/bin/systemctl", "restart", "Project-Zomboid"]
+    p = Popen(c, stdout=subprocess.PIPE)
+    r = p.stdout.read()
+    r = r.decode("utf-8")
+    return r
 
 async def rcon_command(ctx, command):
     c = ["/home/steam/pz_bot/rcon", "-a", f"{RCONSERVER}:{RCONPORT}", "-p",RCONPASS, ]
@@ -192,6 +199,14 @@ class AdminCommands(commands.Cog):
             response = f"{ctx.author}, you don't have admin rights."
         await ctx.send(response)
 
+    @commands.command(pass_context=True)
+    async def pzrestartserver(self, ctx):
+        """Restart the PZ server"""
+        await IsChannelAllowed(ctx)
+        if await IsAdmin(ctx):
+            response = await restart_server(ctx)
+            print(response)
+            await ctx.send("Server is going down for a reboot NOW!")
 
 class ModeratorCommands(commands.Cog):
     """Moderator Server Commands"""
@@ -450,6 +465,14 @@ class UserCommands(commands.Cog):
         option_find = ""
         dc = await getalldeaths(ctx)
         results = dc
+        await ctx.send(results)
+
+
+    @commands.command(pass_context=True)
+    async def whatareyou(self, ctx):
+        """What is the bot"""
+        await IsChannelAllowed(ctx)
+        results = f"I'm a bot for managing Project Zomboid servers, I'm written in python 3.\nRead more here: https://rfalias.github.io/project_zomboid_bot/"
         await ctx.send(results)
 
     @commands.command(pass_context=True)
