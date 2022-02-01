@@ -78,12 +78,15 @@ async def PlayerCheck(lfile, channel):
                 if "fully connected (" in l:
                     user = ls[3].strip('"')
                     if player_notif.get(user, 0) < 1:
+                        print("Send join")
                         await channel.send(f"{user} has joined!")
                     else:
                         player_notif[user] -= 1
 
                     break
                 if "died at (" in l:
+                    if count > 0:
+                        break
                     user = ls[3].strip('"')
                     player_notif[user] = 1
                     await channel.send(f"{user} has died!")
