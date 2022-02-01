@@ -92,6 +92,7 @@ async def getalldeaths(ctx):
                     else:
                         deathdict[player] = 1
     rstring = ""
+    deathdict = dict(reversed(sorted(deathdict.items(), key=lambda item: item[1])))
     for x in deathdict:
         p = x
         c = deathdict[x]
@@ -159,6 +160,10 @@ async def rcon_command(ctx, command):
     print(r)
     return r
 
+async def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 
 async def IsChannelAllowed(ctx):
@@ -171,7 +176,7 @@ async def IsChannelAllowed(ctx):
         raise Exception("Not allowed to operate in channel")
 
 class AdminCommands(commands.Cog):
-    """Moderator Server Commands"""
+    """Admin Server Commands"""
 
     @commands.command(pass_context=True)
     async def pzsetaccess(self, ctx):
@@ -464,8 +469,11 @@ class UserCommands(commands.Cog):
         cmd_split = ctx.message.content.split()
         option_find = ""
         dc = await getalldeaths(ctx)
-        results = dc
-        await ctx.send(results)
+        results = dc.split('\n')
+        clist = chunks(results, 500) 
+        async for c in clist: 
+            print(len(dc))
+            await ctx.send('\n'.join(c))
 
 
     @commands.command(pass_context=True)
