@@ -73,7 +73,7 @@ async def PlayerCheck(lfile, channel):
                 if "removed connection index" in l:
                     user = ls[3].strip('"')
                     player_notif[user] = 0
-                        await channel.send(f"{user} has disconnected!")
+                    await channel.send(f"{user} has disconnected!")
                     break
                 if "fully connected (" in l:
                     user = ls[3].strip('"')
