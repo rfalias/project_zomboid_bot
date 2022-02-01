@@ -470,7 +470,7 @@ class UserCommands(commands.Cog):
         option_find = ""
         dc = await getalldeaths(ctx)
         results = dc.split('\n')
-        clist = chunks(results, 500) 
+        clist = chunks(results, 100) 
         async for c in clist: 
             print(len(dc))
             await ctx.send('\n'.join(c))
