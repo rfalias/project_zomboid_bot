@@ -24,6 +24,7 @@ from subprocess import Popen
 import glob
 import subprocess
 from file_read_backwards import FileReadBackwards
+import datetime
 # Setup environment
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -57,30 +58,34 @@ async def logwatcher():
             player_check = await PlayerCheck(x, nchannel)
 
 
+
+player_notif = {}
 async def PlayerCheck(lfile, channel):
     count = 0
     try:
         with FileReadBackwards(lfile) as frb:
             for l in frb:
-                print(l)
-                ls = l.split()
                 if "disconnected player" in l:
-                    print("at dc")
-                    print(l)
+                    if count == 0:
+                        count += 1
+                        continue
+                ls = l.split()
+                if "removed connection index" in l:
                     user = ls[3].strip('"')
+                    player_notif[user] = 0
                     await channel.send(f"{user} has disconnected!")
                     break
-                if "fully connected" in l:
-                    print("Connected")
-                    print(l)
+                if "fully connected (" in l:
                     user = ls[3].strip('"')
-                    await channel.send(f"{user} has joined!")
+                    if player_notif.get(user, 0) < 1:
+                        await channel.send(f"{user} has joined!")
+                    else:
+                        player_notif[user] -= 1
+
                     break
                 if "died at (" in l:
-                    print("At Died")
-                    print(l)
-
                     user = ls[3].strip('"')
+                    player_notif[user] = 1
                     await channel.send(f"{user} has died!")
                     break
                 break
