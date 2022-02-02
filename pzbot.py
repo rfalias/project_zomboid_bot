@@ -151,7 +151,7 @@ async def restart_server(ctx):
         d = await rcon_command(ctx, [f"players"])
         if "connect: connection refused" in d:
             server_down = True
-        await asyncio.sleep(3)
+        await asyncio.sleep(5)
     
     if os.name == 'nt':
         terminate_zom = '''wmic PROCESS where "name like '%java.exe%' AND CommandLine like '%zomboid.steam%'" Call Terminate'''
