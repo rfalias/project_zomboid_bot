@@ -28,6 +28,7 @@ import subprocess
 import psutil
 import schedule
 import random
+from subprocess import check_output, STDOUT
 
 # Setup environment
 load_dotenv()
@@ -40,6 +41,7 @@ ADMIN_ROLES = os.getenv('ADMIN_ROLES')
 MODERATOR_ROLES = os.getenv('MODERATOR_ROLES')
 WHITELIST_ROLES = os.getenv('WHITELIST_ROLES')
 LOG_PATH = os.getenv('LOG_PATH', "/home/steam/Zomboid/Logs")
+SERVER_PATH = os.getenv('SERVER_PATH', "C:\Program Files (x86)\Steam\steamapps\common\Project Zomboid Dedicated Server")
 ADMIN_ROLES = ADMIN_ROLES.split(',')
 WHITELIST_ROLES = WHITELIST_ROLES.split(',')
 IGNORE_CHANNELS = os.getenv('IGNORE_CHANNELS')
@@ -141,10 +143,20 @@ async def IsServerRunning():
     return False
 
 async def restart_server(ctx):
-    c = ["sudo", "/usr/bin/systemctl", "restart", "Project-Zomboid"]
-    p = Popen(c, stdout=subprocess.PIPE)
-    r = p.stdout.read()
-    r = r.decode("utf-8")
+    if os.name == 'nt':
+        rcon_command(ctx,[f"save"])
+        terminate_zom = '''wmic PROCESS where "name like '%java.exe%' AND CommandLine like '%zomboid.steam%'" Call Terminate'''
+        terminate_shell = '''wmic PROCESS where "name like '%cmd.exe%' AND CommandLine like '%StartServer64.bat%'" Call Terminate'''
+        check_output(terminate_zom, shell=True)
+        check_output(terminate_shell, shell=True)
+        server_start = [os.path.join(SERVER_PATH,"StartServer64.bat")]
+        p = Popen(server_start, creationflags=subprocess.CREATE_NEW_CONSOLE)
+    else:
+        rcon_command(ctx,[f"save"])
+        c = ["sudo", "/usr/bin/systemctl", "restart", "Project-Zomboid"]
+        p = Popen(c, stdout=subprocess.PIPE)
+        r = p.stdout.read()
+        r = r.decode("utf-8")
     return r
 
 async def rcon_command(ctx, command):
