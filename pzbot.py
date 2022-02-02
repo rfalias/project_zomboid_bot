@@ -29,7 +29,7 @@ import psutil
 import schedule
 import random
 from subprocess import check_output, STDOUT
-
+import time
 # Setup environment
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -42,6 +42,7 @@ MODERATOR_ROLES = os.getenv('MODERATOR_ROLES')
 WHITELIST_ROLES = os.getenv('WHITELIST_ROLES')
 LOG_PATH = os.getenv('LOG_PATH', "/home/steam/Zomboid/Logs")
 SERVER_PATH = os.getenv('SERVER_PATH', "C:\Program Files (x86)\Steam\steamapps\common\Project Zomboid Dedicated Server")
+RCON_PATH = os.getenv('RCON_PATH','./')
 ADMIN_ROLES = ADMIN_ROLES.split(',')
 WHITELIST_ROLES = WHITELIST_ROLES.split(',')
 IGNORE_CHANNELS = os.getenv('IGNORE_CHANNELS')
@@ -143,32 +144,45 @@ async def IsServerRunning():
     return False
 
 async def restart_server(ctx):
+    await ctx.send("Shutting server down, please wait...")
+    await rcon_command(ctx,[f"quit"])
+    server_down = False
+    while not server_down:
+        d = await rcon_command(ctx, [f"players"])
+        if "connect: connection refused" in d:
+            server_down = True
+        await asyncio.sleep(3)
+    
     if os.name == 'nt':
-        rcon_command(ctx,[f"save"])
         terminate_zom = '''wmic PROCESS where "name like '%java.exe%' AND CommandLine like '%zomboid.steam%'" Call Terminate'''
         terminate_shell = '''wmic PROCESS where "name like '%cmd.exe%' AND CommandLine like '%StartServer64.bat%'" Call Terminate'''
         check_output(terminate_zom, shell=True)
         check_output(terminate_shell, shell=True)
         server_start = [os.path.join(SERVER_PATH,"StartServer64.bat")]
         p = Popen(server_start, creationflags=subprocess.CREATE_NEW_CONSOLE)
+        r = p.stdout.read()
+        r = r.decode("utf-8")
     else:
-        rcon_command(ctx,[f"save"])
         c = ["sudo", "/usr/bin/systemctl", "restart", "Project-Zomboid"]
         p = Popen(c, stdout=subprocess.PIPE)
         r = p.stdout.read()
         r = r.decode("utf-8")
-    return r
+    await ctx.send("Server restarted, it may take a minute to be fully ready")
 
 async def rcon_command(ctx, command):
-    c = ["/home/steam/pz_bot/rcon", "-a", f"{RCONSERVER}:{RCONPORT}", "-p",RCONPASS, ]
+    c = [os.path.join(RCON_PATH,"rcon"), "-a", f"{RCONSERVER}:{RCONPORT}", "-p",RCONPASS]
     cmd = [" ".join(command)]
     c.extend(cmd)
     
 
     print(c)
-    p = Popen(c, stdout=subprocess.PIPE)
+    p = Popen(c, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     r = p.stdout.read()
     r = r.decode("utf-8")
+    e = p.stderr.read()
+    e = e.decode("utf-8")
+    if e:
+        r = e
     print(r)
     return r
 
@@ -221,9 +235,7 @@ class AdminCommands(commands.Cog):
         """Restart the PZ server"""
         await IsChannelAllowed(ctx)
         if await IsAdmin(ctx):
-            response = await restart_server(ctx)
-            print(response)
-            await ctx.send("Server is going down for a reboot NOW!")
+            bot.loop.create_task(restart_server(ctx))
 
 class ModeratorCommands(commands.Cog):
     """Moderator Server Commands"""
