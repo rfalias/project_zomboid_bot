@@ -87,6 +87,7 @@ Default settings are setup to work with this installer: https://github.com/rfali
 # Usage
 ```
 AdminCommands:
+  pzrestartserver Restart the PZ server
   pzsetaccess     Set the access level of a specific user.
 ModeratorCommands:
   pzgetsteamid    Lookup steamid of user
@@ -106,6 +107,7 @@ UserCommands:
   pzlistmods      List currently installed mods
   pzplayers       Show current active players on the server
   pzrequestaccess Request access to the PZ server. A password will be DMd to ...
+  whatareyou      What is the bot
 ​No Category:
   help            Shows this message
 
