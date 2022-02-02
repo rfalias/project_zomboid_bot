@@ -149,7 +149,7 @@ async def restart_server(ctx):
     server_down = False
     while not server_down:
         d = await rcon_command(ctx, [f"players"])
-        if "connect: connection refused" in d:
+        if "refused" in d:
             server_down = True
         await asyncio.sleep(5)
     
