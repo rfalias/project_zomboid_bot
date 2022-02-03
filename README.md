@@ -53,7 +53,8 @@ https://leviwheatcroft.github.io/selfhosted-awesome-unlist/rcon-cli.html
 
 Make sure your PZ rcon server is listening on 27015
 
-Create a .env file in the same directory as the pzbot.py file  
+You must have a .`env` file present in the root directory of the project. Copy the sample environment variable file template provided in the project root directory: `cp .env.sample .env`
+  
 All of these should be filled out. To get channel id's, enable dev mode on your discord app, and right click a channel and click 'copy id'   
 ```
 RCON_PASS=SuperPassword
