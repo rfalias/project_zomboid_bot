@@ -27,6 +27,18 @@ The bot will DM them with their new password and connection information to the s
 !pzrequestaccess someuser  
 ```
 
+#### Player deaths and time on server  
+Generate a live report of active playtime by users on your server. Updates live for actively connected users as well.  
+```
+!pzplaytime
+User1 has played for 1d, 7h, 24m, 58s
+User2 has played for 1d, 1h, 46m, 15s
+Survivor1 has played for 17h, 13m, 40s
+Noob1 has played for 10h, 0m, 40s
+Survivor2 has played for 3h, 43m, 41s
+
+```
+
 ### This must be locally hosted on your PZ server due to the interactions it requires to get specific information
 Due to how this bot interacts with the server for specific information (rcon, log files, active processes) it must be running on the server that runs project zomboid
 
