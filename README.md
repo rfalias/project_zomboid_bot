@@ -103,6 +103,7 @@ AdminCommands:
   pzrestartserver Restart the PZ server
   pzsetaccess     Set the access level of a specific user.
 ModeratorCommands:
+  pzadditem       Adds an item to the specified user's inventory
   pzgetsteamid    Lookup steamid of user
   pzkick          Kick a user
   pzsave          Save the current world
@@ -115,10 +116,11 @@ ModeratorCommands:
   pzwhitelistall  Whitelist all active users
 UserCommands:
   pzdeathcount    Get the total death count of a player
-  pzdeaths        Get the total death count of al players
+  pzdeaths        Get the total death count of all players
   pzgetoption     Get the value of a server option
   pzlistmods      List currently installed mods
   pzplayers       Show current active players on the server
+  pzplaytime      Get the total playtime of all players
   pzrequestaccess Request access to the PZ server. A password will be DMd to ...
   whatareyou      What is the bot
 ​No Category:
