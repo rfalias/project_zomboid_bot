@@ -30,6 +30,8 @@ import schedule
 import random
 from subprocess import check_output, STDOUT
 import time
+from datetime import datetime
+
 # Setup environment
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -73,8 +75,84 @@ async def GetDeathCount(ctx, player):
                 if player.lower() in line.lower():
                     if "died" in line:
                         deathcount += 1
-    return f"{player} has died {deathcount} times"
 
+    t = await lookuptime(ctx, player)
+    return f"{player} has died {deathcount} times. Playtime: {t}"
+
+async def pretty_time_delta(seconds):
+    sign_string = '-' if seconds < 0 else ''
+    seconds = abs(int(seconds))
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    if days > 0:
+        return '%s%dd, %dh, %dm, %ds' % (sign_string, days, hours, minutes, seconds)
+    elif hours > 0:
+        return '%s%dh, %dm, %ds' % (sign_string, hours, minutes, seconds)
+    elif minutes > 0:
+        return '%s%dm, %ds' % (sign_string, minutes, seconds)
+    else:
+        return '%s%ds' % (sign_string, seconds)
+
+async def getallplaytime(ctx):
+    logs = list()
+    user_time = {}
+    for root, dirs, files in os.walk(LOG_PATH):
+        for f in files:
+            if "_user.txt" in f:
+                lpath = os.path.join(root,f)
+                logs.append(lpath)
+    connect_time = {}
+    fc_last_date = {}
+    dc_last_date = {}
+    for log in logs:
+        with open(log, 'r') as file:
+            for line in file:
+                if "fully connected" in line:
+                    c_sl = line.split()
+                    c_username = c_sl[3].strip('"')
+                    c_etime = " ".join(c_sl[:2]).strip("[]")
+                    c_dt = datetime.strptime(c_etime, '%d-%m-%y %H:%M:%S.%f')
+                    connect_time[c_username] = c_dt
+                    if fc_last_date.get(c_username, datetime.min) < c_dt:
+                        fc_last_date[c_username] = c_dt
+
+                if "removed connection" in line:
+                    r_sl = line.split()
+                    r_username = r_sl[3].strip('"')
+                    r_etime = " ".join(r_sl[:2]).strip("[]")
+                    r_dt = datetime.strptime(r_etime, '%d-%m-%y %H:%M:%S.%f')
+                    if r_username in connect_time:
+                        time_segment = r_dt - connect_time[r_username]
+                        time_segment = time_segment
+                        if r_username not in user_time.keys():
+                            user_time[r_username] = time_segment
+                        else:
+                            user_time[r_username] = time_segment + user_time[r_username]
+                        del connect_time[r_username]
+                    if dc_last_date.get(r_username, datetime.min) < r_dt:
+                        dc_last_date[r_username] = r_dt
+
+    for user in dc_last_date:
+        if user in fc_last_date:
+            if dc_last_date[user] < fc_last_date[user]:
+                user_time[user] = user_time[user] + (datetime.now() - fc_last_date[user])
+                print(f"User {user} probably still connected")
+                u = user + "(active)"
+                user_time[u] = user_time[user]
+                del user_time[user]
+    user_time = dict(reversed(sorted(user_time.items(), key=lambda item: item[1])))
+    for user in user_time:
+        time_pretty = await pretty_time_delta(user_time[user].total_seconds())
+        user_time[user] = time_pretty
+    return user_time
+
+
+async def lookuptime(ctx, username):
+    pl = await getallplaytime(ctx)
+    for user in pl:
+        if username == user.replace("(active)",""):
+            return pl[user]
 
 async def getalldeaths(ctx):
     deathcount = 0
@@ -99,8 +177,8 @@ async def getalldeaths(ctx):
     for x in deathdict:
         p = x
         c = deathdict[x]
-        rstring += f"{p} has died {c} times\n"
-    print(rstring)
+        t = await lookuptime(ctx, p)
+        rstring += f"{p} has died {c} times. Playtime: {t}\n"
     return rstring
 
 
@@ -162,20 +240,12 @@ async def restart_server(ctx):
         p = Popen(server_start, creationflags=subprocess.CREATE_NEW_CONSOLE)
         r = p.stdout.read()
         r = r.decode("utf-8")
-    else:
-        c = ["sudo", "/usr/bin/systemctl", "restart", "Project-Zomboid"]
-        p = Popen(c, stdout=subprocess.PIPE)
-        r = p.stdout.read()
-        r = r.decode("utf-8")
     await ctx.send("Server restarted, it may take a minute to be fully ready")
 
 async def rcon_command(ctx, command):
     c = [os.path.join(RCON_PATH,"rcon"), "-a", f"{RCONSERVER}:{RCONPORT}", "-p",RCONPASS]
     cmd = [" ".join(command)]
     c.extend(cmd)
-    
-
-    print(c)
     p = Popen(c, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     r = p.stdout.read()
     r = r.decode("utf-8")
@@ -183,7 +253,6 @@ async def rcon_command(ctx, command):
     e = e.decode("utf-8")
     if e:
         r = e
-    print(r)
     return r
 
 async def chunks(lst, n):
@@ -247,7 +316,6 @@ class ModeratorCommands(commands.Cog):
         if not await IsChannelAllowed(ctx):
             return
         if await IsMod(ctx):
-            print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
             try:
@@ -267,7 +335,6 @@ class ModeratorCommands(commands.Cog):
         """Steam unban a user"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
             try:
@@ -288,7 +355,6 @@ class ModeratorCommands(commands.Cog):
         """Teleport a user to another user"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
             try:
@@ -309,7 +375,6 @@ class ModeratorCommands(commands.Cog):
         """Kick a user"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
             try:
@@ -329,7 +394,6 @@ class ModeratorCommands(commands.Cog):
         """Whitelist a user"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
             try:
@@ -350,7 +414,6 @@ class ModeratorCommands(commands.Cog):
         """Broadcast a server message"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             access_split = ctx.message.content.split()
             try:
                 access_split = access_split[1:]
@@ -370,7 +433,6 @@ class ModeratorCommands(commands.Cog):
         """Remove a whitelisted user"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
             try:
@@ -391,7 +453,6 @@ class ModeratorCommands(commands.Cog):
         """Whitelist all active users"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             c_run = await rcon_command(ctx,[f"addalltowhitelist"])
             response = f"{c_run}"
         else:
@@ -404,7 +465,6 @@ class ModeratorCommands(commands.Cog):
         """Save the current world"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             c_run = await rcon_command(ctx,[f"save"])
             response = f"{c_run}"
         else:
@@ -416,7 +476,6 @@ class ModeratorCommands(commands.Cog):
         """Lookup steamid of user"""
         await IsChannelAllowed(ctx)
         if await IsMod(ctx):
-            print(ctx.message.content)
             access_split = ctx.message.content.split()
             user = ""
             try:
@@ -446,8 +505,6 @@ class UserCommands(commands.Cog):
         c_run = "\n".join(c_run.split('\n')[1:-1])
         results = f"Current players in game:\n{c_run}"
         await ctx.send(results)
-
-
 
 
     @commands.command(pass_context=True)
@@ -487,16 +544,28 @@ class UserCommands(commands.Cog):
         await ctx.send(results)
 
     @commands.command(pass_context=True)
-    async def pzdeaths(self, ctx):
-        """Get the total death count of al players"""
+    async def pzplaytime(self, ctx):
+        """Get the total playtime of all players"""
         await IsChannelAllowed(ctx)
         cmd_split = ctx.message.content.split()
-        option_find = ""
+        dc = await getallplaytime(ctx)
+        pt_list = list()
+        for user in dc:
+            upt = dc[user]
+            pt_list.append(f"{user} has played for {upt}")
+        clist = chunks(pt_list, 100)
+        async for c in clist:
+            await ctx.send('\n'.join(c))
+
+    @commands.command(pass_context=True)
+    async def pzdeaths(self, ctx):
+        """Get the total death count of all players"""
+        await IsChannelAllowed(ctx)
+        cmd_split = ctx.message.content.split()
         dc = await getalldeaths(ctx)
         results = dc.split('\n')
         clist = chunks(results, 100) 
         async for c in clist: 
-            print(len(dc))
             await ctx.send('\n'.join(c))
 
 
@@ -558,8 +627,6 @@ async def status_task():
         _serverUp = await IsServerRunning()
         if _serverUp:
             playercount = await pzplayers()
-            print(playercount)
-            
             await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{playercount} survivors online"))
         else:
             await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"Server offline"))
