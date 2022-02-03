@@ -371,6 +371,28 @@ class ModeratorCommands(commands.Cog):
         await ctx.send(response)
 
     @commands.command(pass_context=True)
+    async def pzadditem(self, ctx):
+        """Adds an item to the specified user's inventory"""
+        await IsChannelAllowed(ctx)
+        if await IsMod(ctx):
+            print(ctx.message.content)
+            access_split = ctx.message.content.split()
+            user = ""
+            item = ""
+            try:
+                user = access_split[1]
+                item = access_split[2]
+            except IndexError as ie:
+                response =f"Invalid command. Try !pzadditem USER ITEM"
+                await ctx.send(response)
+                return
+            c_run = await rcon_command(ctx,[f"additem", f"{user}", f"{item}"])
+            response = f"{c_run}"
+        else:
+            response = f"{ctx.author}, you don't have admin rights."
+        await ctx.send(response)
+
+    @commands.command(pass_context=True)
     async def pzkick(self, ctx):
         """Kick a user"""
         await IsChannelAllowed(ctx)
