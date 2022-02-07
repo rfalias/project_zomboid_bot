@@ -20,8 +20,6 @@ from concurrent.futures import ThreadPoolExecutor
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
-from rcon import rcon
-from rcon import Client
 from subprocess import Popen
 import glob
 import subprocess
@@ -31,7 +29,7 @@ import random
 from subprocess import check_output, STDOUT
 import time
 from datetime import datetime
-
+from SourceRcon import SourceRcon
 # Setup environment
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -50,6 +48,8 @@ WHITELIST_ROLES = WHITELIST_ROLES.split(',')
 IGNORE_CHANNELS = os.getenv('IGNORE_CHANNELS')
 SERVER_ADDRESS = os.getenv('SERVER_ADDRESS')
 NOTIFICATION_CHANNEL = os.getenv('NOTIFICATION_CHANNEL')
+RESTART_CMD = os.getenv('RESTART_CMD', 'systemctl restart Project-Zomboid')
+
 try:
     IGNORE_CHANNELS = IGNORE_CHANNELS.split(',')
 except: 
@@ -240,20 +240,15 @@ async def restart_server(ctx):
         p = Popen(server_start, creationflags=subprocess.CREATE_NEW_CONSOLE)
         r = p.stdout.read()
         r = r.decode("utf-8")
+    else:
+        check_output(RESTART_CMD, shell=True)
+
     await ctx.send("Server restarted, it may take a minute to be fully ready")
 
 async def rcon_command(ctx, command):
-    c = [os.path.join(RCON_PATH,"rcon"), "-a", f"{RCONSERVER}:{RCONPORT}", "-p",RCONPASS]
-    cmd = [" ".join(command)]
-    c.extend(cmd)
-    p = Popen(c, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    r = p.stdout.read()
-    r = r.decode("utf-8")
-    e = p.stderr.read()
-    e = e.decode("utf-8")
-    if e:
-        r = e
-    return r
+    sr = SourceRcon(RCONSERVER, int(RCONPORT), RCONPASS)
+    r = sr.rcon(" ".join(command))
+    return r.decode('utf-8')
 
 async def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -524,6 +519,7 @@ class UserCommands(commands.Cog):
         await IsChannelAllowed(ctx)
         c_run = ""
         c_run = await rcon_command(ctx, ["players"])
+        print(c_run)
         c_run = "\n".join(c_run.split('\n')[1:-1])
         results = f"Current players in game:\n{c_run}"
         await ctx.send(results)
