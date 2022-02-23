@@ -48,7 +48,7 @@ WHITELIST_ROLES = WHITELIST_ROLES.split(',')
 IGNORE_CHANNELS = os.getenv('IGNORE_CHANNELS')
 SERVER_ADDRESS = os.getenv('SERVER_ADDRESS')
 NOTIFICATION_CHANNEL = os.getenv('NOTIFICATION_CHANNEL')
-RESTART_CMD = os.getenv('RESTART_CMD', 'systemctl restart Project-Zomboid')
+RESTART_CMD = os.getenv('RESTART_CMD', 'sudo systemctl restart Project-Zomboid')
 
 try:
     IGNORE_CHANNELS = IGNORE_CHANNELS.split(',')
@@ -223,7 +223,9 @@ async def IsServerRunning():
 
 async def restart_server(ctx):
     await ctx.send("Shutting server down, please wait...")
-    await rcon_command(ctx,[f"quit"])
+    await rcon_command(ctx,[f"save"])
+    co = check_output(RESTART_CMD, shell=True)
+    await ctx.send(f"Server restarted, it may take a minute to be fully ready")
     server_down = False
     while not server_down:
         d = await rcon_command(ctx, [f"players"])
@@ -246,9 +248,12 @@ async def restart_server(ctx):
     await ctx.send("Server restarted, it may take a minute to be fully ready")
 
 async def rcon_command(ctx, command):
-    sr = SourceRcon(RCONSERVER, int(RCONPORT), RCONPASS)
-    r = sr.rcon(" ".join(command))
-    return r.decode('utf-8')
+    try:
+        sr = SourceRcon(RCONSERVER, int(RCONPORT), RCONPASS)
+        r = sr.rcon(" ".join(command))
+        return r.decode('utf-8')
+    except Exception as e:
+        print(e)
 
 async def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -520,6 +525,8 @@ class UserCommands(commands.Cog):
         c_run = ""
         c_run = await rcon_command(ctx, ["players"])
         print(c_run)
+        if not c_run:
+            return
         c_run = "\n".join(c_run.split('\n')[1:-1])
         results = f"Current players in game:\n{c_run}"
         await ctx.send(results)
@@ -644,7 +651,14 @@ async def status_task():
     while True:
         _serverUp = await IsServerRunning()
         if _serverUp:
-            playercount = await pzplayers()
+            playercount = 0
+            try:
+                playercount = await pzplayers()
+            except Exception as e:
+                print(e)
+                await asyncio.sleep(20)
+                continue
+              
             await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{playercount} survivors online"))
         else:
             await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"Server offline"))
