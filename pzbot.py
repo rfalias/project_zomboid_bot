@@ -54,12 +54,12 @@ try:
     IGNORE_CHANNELS = IGNORE_CHANNELS.split(',')
 except: 
     IGNORE_CHANNELS = ""
-bot = commands.Bot(command_prefix='!')
-access_levels = ['admin', 'none', 'moderator']
 intents = discord.Intents.default()
 intents.members = True
+bot = commands.Bot(command_prefix='!', intents=intents)
+access_levels = ['admin', 'none', 'moderator']
 block_notified = list()
-client = discord.Client()
+client = discord.Client(intents=intents)
 
 async def GetDeathCount(ctx, player):
     deathcount = 0
