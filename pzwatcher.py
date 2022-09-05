@@ -32,11 +32,11 @@ GUILD = os.getenv('DISCORD_GUILD')
 LOG_PATH = os.getenv('LOG_PATH', "/home/steam/Zomboid/Logs")
 NOTIFICATION_CHANNEL = os.getenv('NOTIFICATION_CHANNEL')
 INGAME_CHANNEL = os.getenv('INGAME_CHANNEL')
-bot = commands.Bot(command_prefix='!')
-access_levels = ['admin', 'none', 'moderator']
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
-client = discord.Client()
+bot = commands.Bot(command_prefix='!', intents=intents)
+access_levels = ['admin', 'none', 'moderator']
+client = discord.Client(intents=intents)
 
 
 import asyncio

@@ -54,7 +54,7 @@ try:
     IGNORE_CHANNELS = IGNORE_CHANNELS.split(',')
 except: 
     IGNORE_CHANNELS = ""
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 access_levels = ['admin', 'none', 'moderator']
